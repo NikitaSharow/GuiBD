@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,20 +8,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using MySql.Data.MySqlClient;
 
 namespace WinFormProject
 {
-    public partial class change : Form
+    public partial class Del : Form
     {
-        public change()
+        public Del()
         {
             InitializeComponent();
         }
 
         string[] dataGrifFild = new string[20];
 
-        private void change_Load(object sender, EventArgs e)
+        private void Del_Load(object sender, EventArgs e)
         {
             try
             {
@@ -33,7 +33,7 @@ namespace WinFormProject
                 MySqlCommand command = new MySqlCommand(sql, myConnection);
                 MySqlDataReader reader = command.ExecuteReader();
 
-                
+
                 int kol = 0;
                 while (reader.Read())
                 {
@@ -62,7 +62,7 @@ namespace WinFormProject
                     for (int i = 0; i < kol; i++)
                         data[data.Count - 1][i] = reader[i].ToString();
                 }
-                
+
                 reader.Close();
                 myConnection.Close();
                 foreach (string[] s in data)
@@ -71,39 +71,37 @@ namespace WinFormProject
             catch (Exception ex)
             { MessageBox.Show("Ошибка!" + ex); }
         }
-
         int row;
-        int column;
-
-        private void dataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            row = e.RowIndex;
-            column = e.ColumnIndex;
+            row = dataGridView1.CurrentCell.RowIndex;
+            //MessageBox.Show(row.ToString());
+            //MessageBox.Show(dataGridView1[0, row].Value.ToString());
         }
-        private void Button1_Click(object sender, EventArgs e)
+
+        private void button1_Click(object sender, EventArgs e)
         {
             try 
             {
-                //MessageBox.Show(dataGrifFild[column]);
-                //MessageBox.Show(dataGridView1[0, row].Value.ToString());
-                //MessageBox.Show(dataGridView1[column, row].Value.ToString());
 
                 string myConnectionString = "Database=" + Program.bd + ";Data Source=" + Program.host + ";User Id=" + Program.user + ";Password=" + Program.pass;
                 MySqlConnection myConnection = new MySqlConnection(myConnectionString);
                 myConnection.Open();
 
-                string sql = "UPDATE `project`.`cars` SET `" + dataGrifFild[column] 
-                    + "` = '" + dataGridView1[column, row].Value 
-                    + "' WHERE `cars`.`id` = " + dataGridView1[0, row].Value;
-                MySqlCommand com = new MySqlCommand(sql, myConnection);
+                string sql = "DELETE FROM `project`.`cars` WHERE `cars`.`id` = " 
+                    + dataGridView1[0, row].Value.ToString();
+                MessageBox.Show(sql);
 
-                com.ExecuteNonQuery();
-                MessageBox.Show("Данные обновленны! ");
+                MySqlCommand command = new MySqlCommand(sql, myConnection);
+                var result = MessageBox.Show("Вы уверены?", "", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
+                { MessageBox.Show("Данные удалены!"); command.ExecuteNonQuery();}
 
-                myConnection.Close();
+                
             }
             catch (Exception ex)
             { MessageBox.Show("Ошибка!" + ex); }
+
         }
     }
 }

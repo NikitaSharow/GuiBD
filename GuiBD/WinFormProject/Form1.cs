@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,14 +21,19 @@ namespace WinFormProject
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string bd = "project";
-            string host = "localhost";
-            string user = "root";
-            string pass = "";
+            string[] lines = File.ReadAllLines("../../../properties.txt");
+            foreach (string line in lines)
+            {
+                string[] parts = line.Split(new string[] { "," }, StringSplitOptions.None);
+                Program.bd = parts[0];
+                Program.host = parts[1];
+                Program.user = parts[2];
+                Program.pass = parts[3];
+            }
 
             try
             {
-                string myConnectionString = "Database=" + bd + ";Data Source=" + host + ";User Id=" + user + ";Password=" + pass;
+                string myConnectionString = "Database=" + Program.bd + ";Data Source=" + Program.host + ";User Id=" + Program.user + ";Password=" + Program.pass;
                 MySqlConnection myConnection = new MySqlConnection(myConnectionString);
                 myConnection.Open();
                 MessageBox.Show("Подключение прошло успешно!");

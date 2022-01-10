@@ -18,32 +18,68 @@ namespace WinFormProject
             InitializeComponent();
         }
 
+        string[] dataGrifFild = new string[20];
+        int kol = 0;
+
+        private void Add2_Load(object sender, EventArgs e)
+        {
+            string myConnectionString = "Database=" + Program.bd + ";Data Source=" + Program.host + ";User Id=" + Program.user + ";Password=" + Program.pass;
+            MySqlConnection myConnection = new MySqlConnection(myConnectionString);
+            myConnection.Open();
+
+            string sql = "SHOW COLUMNS FROM `project`.`cars`";
+            MySqlCommand command = new MySqlCommand(sql, myConnection);
+            MySqlDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                dataGrifFild[kol] = reader[0].ToString();
+                kol++;
+            }
+            for (int i = 0; i < kol; i++)
+                dataGridView1.Columns.Add(dataGrifFild[i], dataGrifFild[i]);
+            myConnection.Close();
+        }
+
         private void Button1_Click(object sender, EventArgs e)
         {
             try
             {
-                string bd = "project";
-                string host = "localhost";
-                string user = "root";
-                string pass = "";
-
-                string myConnectionString = "Database=" + bd + ";Data Source=" + host + ";User Id=" + user + ";Password=" + pass;
+                string myConnectionString = "Database=" + Program.bd + ";Data Source=" + Program.host + ";User Id=" + Program.user + ";Password=" + Program.pass;
                 MySqlConnection myConnection = new MySqlConnection(myConnectionString);
                 myConnection.Open();
 
-                String s; String s2;// String s3; String s4;
-                DataGridViewRow row;
-                MessageBox.Show(dataGridView1.Rows.Count.ToString());
-                for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)
+                string sql = "INSERT INTO `cars` (" ;
+                for (int i = 0; i < kol; i++)
                 {
-                    row = dataGridView1.Rows[i];
-                    s = row.Cells[0].Value.ToString();
-                    s2 = row.Cells[3].Value.ToString();
-                    string sql = "INSERT INTO `cars` (`num`,`model`) VALUES (" + s + "," + s2 + ");";
-                    MySqlCommand com = new MySqlCommand(sql, myConnection);
-                    //MessageBox.Show(s);
-                    com.ExecuteNonQuery();
+                    if (i == 0)
+                        sql = sql + "`" + dataGrifFild[i] + "`";
+                    else 
+                        sql = sql + ",`" + dataGrifFild[i] + "`";
                 }
+                sql += ") VALUES (";
+
+                DataGridViewRow row;
+
+                for (int c = 0; c < dataGridView1.Rows.Count - 1; c++)
+                {
+                    row = dataGridView1.Rows[c];
+                    for (int i = 0; i < kol; i++)
+                    {
+                        if (c == 0 && i == 0 && row.Cells[i].Value != null)
+                            sql = sql + "'" + row.Cells[i].Value.ToString() + "'";
+                        else if (row.Cells[i].Value != null)
+                            sql = sql + " ,'" + row.Cells[i].Value.ToString() + "'";
+                        else
+                            sql = sql + ", ''";
+                    }
+                }
+                sql += ");";
+                MessageBox.Show(sql);
+
+                MySqlCommand com = new MySqlCommand(sql, myConnection);
+                com.ExecuteNonQuery();
+                MessageBox.Show("Данные добавлены!");
 
                 myConnection.Close();
             }
@@ -53,9 +89,6 @@ namespace WinFormProject
             }
         }
 
-        private void Add2_Load(object sender, EventArgs e)
-        {
-
-        }
+        
     }
 }

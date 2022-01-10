@@ -213,7 +213,7 @@ namespace WinFormProject
                     for (int i = 0; i < kol; i++)
                         data[data.Count - 1][i] = reader[i].ToString();
                 }
-
+                
                 reader.Close();
                 myConnection.Close();
                 foreach (string[] s in data)
@@ -243,12 +243,7 @@ namespace WinFormProject
                 string sql = "SELECT `pic` FROM `project`.`cars` WHERE `id`='";
                 sql = sql + s + "'";
 
-                string bd = "project";
-                string host = "localhost";
-                string user = "root";
-                string pass = "";
-
-                string myConnectionString = "Database=" + bd + ";Data Source=" + host + ";User Id=" + user + ";Password=" + pass;
+                string myConnectionString = "Database=" + Program.bd + ";Data Source=" + Program.host + ";User Id=" + Program.user + ";Password=" + Program.pass;
                 MySqlConnection myConnection = new MySqlConnection(myConnectionString);
                 myConnection.Open();
 

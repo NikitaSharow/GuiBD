@@ -59,12 +59,7 @@ namespace WinFormProject
         {
             try
             {
-                string bd = "project";
-                string host = "localhost";
-                string user = "root";
-                string pass = "";
-
-                string myConnectionString = "Database=" + bd + ";Data Source=" + host + ";User Id=" + user + ";Password=" + pass;
+                string myConnectionString = "Database=" + Program.bd + ";Data Source=" + Program.host + ";User Id=" + Program.user + ";Password=" + Program.pass;
                 MySqlConnection myConnection = new MySqlConnection(myConnectionString);
                 myConnection.Open();
 
@@ -76,7 +71,17 @@ namespace WinFormProject
                 {
                     MessageBox.Show("Успешно ");
                     if (reader[0].ToString() == "admin")
-                    { MessageBox.Show("Вам доступны права админа"); Admin = true; }
+                    { 
+                        MessageBox.Show("Вам доступны права админа"); 
+                        Admin = true;
+                        button7.Visible = true;
+                        textBox4.Visible = true;
+                        textBox3.Visible = true;
+                        comboBox1.Visible = true;
+                        label3.Visible = true;
+                        label4.Visible = true;
+                        label5.Visible = true;
+                    }
                 }
                 else
                     MessageBox.Show("Неверный логин или пароль");
@@ -89,9 +94,32 @@ namespace WinFormProject
         private void button4_Click(object sender, EventArgs e)
         {
             if (Admin)
-            {}
+            { Form Del = new Del(); Del.Show(); }
             else
                 MessageBox.Show("Недостаточно прав");
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string myConnectionString = "Database=" + Program.bd + ";Data Source=" + Program.host + ";User Id=" + Program.user + ";Password=" + Program.pass;
+                MySqlConnection myConnection = new MySqlConnection(myConnectionString);
+                myConnection.Open();
+
+                string sql = "INSERT INTO `usersdata` (`login`,`password`,`root`) VALUES ('" 
+                    + textBox4.Text + "','" + textBox3.Text + "','" + comboBox1.Text + "');";
+            
+                MessageBox.Show(sql);
+
+                MySqlCommand com = new MySqlCommand(sql, myConnection);
+                com.ExecuteNonQuery();
+                MessageBox.Show("Пользователь добавлен!");
+
+                myConnection.Close();
+            }
+            catch (Exception ex)
+            { MessageBox.Show("Ошибка!" + ex); }
         }
     }
 }
